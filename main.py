@@ -6,13 +6,9 @@ def karatsuba_mult( A, B ):
         return A[0] * B[0]
 
     # Ensure arrays' int values are both <= 1000
-    num1 = ""
-    for c in A:
-        num1 += str(c)
-    num2 = ""
-    for c in B:
-        num2 += str(c)
-    if int(num1) > 1000 or int(num2) > 1000:
+    numA = get_array_int_val(A)
+    numB = get_array_int_val(B)
+    if numA > 1000 or numB > 1000:
         return -1
 
     # Ensure arrays are same length by padding 0's if necessary
@@ -24,12 +20,12 @@ def karatsuba_mult( A, B ):
     # m = middle index
     m = math.floor(len(A)//2)
 
-    # split arrays, account for odd array lengths in x0
+    # split arrays
     x1 = A[:m]
-    x0 = A[m:] if len(A) % 2 == 0 else A[m+1:]
+    x0 = A[m:]
 
     y1 = B[:m]
-    y0 = B[m:] if len(B) % 2 == 0 else B[m+1:]
+    y0 = B[m:]
 
     # z0 = x0y0
     # z1 = x1y0 + x0y1 = (x1 + x0)(y1 + y0) - x1y1 - x0y0
@@ -39,6 +35,8 @@ def karatsuba_mult( A, B ):
     z2 = karatsuba_mult(x1, y1)
     z1 = karatsuba_mult(add_arrays(x1, x0), add_arrays(y1, y0)) - z2 - z0
 
+    l = len(A)
+    m = l - m   # because we index array from left, but digit significance is from right
     # xy = z2(B^2m) + z1(B^m) + z0
     # base 10 --> B = 10
     return (z2 * math.pow(10, m * 2)) + (z1 * math.pow(10, m)) + z0
@@ -69,6 +67,15 @@ def add_arrays(A, B):
         C.insert(0, int(carry))
 
     return C
+
+def get_array_int_val( A ):
+    num = 0
+    numstr = ""
+    for c in A:
+        numstr += str(c)
+    if numstr != "":
+        num += int(numstr)
+    return num
 
 def main():
     # Get input values
