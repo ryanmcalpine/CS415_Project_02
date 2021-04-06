@@ -122,12 +122,9 @@ def halve_array( A ):
     d = [int(A[0])]
     while i <= len(A):
         if get_array_int_val(d) / 2 >= 1:
-            #Q.append( int(A[i]) / 2 )
             Q.append( math.floor(get_array_int_val(d) / 2) )
             d = [int(get_array_int_val(d) % 2)]
         else:
-            if get_array_int_val(d) == 0:
-                Q.append( int(0) )
             if i == len(A) and get_array_int_val(d) == 0:
                 return Q
             elif i == len(A) and get_array_int_val(d) != 0:
@@ -135,6 +132,8 @@ def halve_array( A ):
                 print("Halved array with remainder ", get_array_int_val(d), "\n")
             else:
                 d.append(int(A[i]))
+                if A[i] == 0:
+                    Q.append(int(0))
 
             i += 1
 
