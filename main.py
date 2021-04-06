@@ -3,22 +3,24 @@ import math
 def karatsuba_mult( A, B ):
     # Base case: single digits
     if len(A) == 1 and len(B) == 1:
-        return A[0] * B[0]
+        c = int(A[0]) * int(B[0])
+        C = get_int_array(c)
+        return C
 
     # Ensure arrays' int values are both <= 1000
-    numA = get_array_int_val(A)
-    numB = get_array_int_val(B)
-    if numA > 1000 or numB > 1000:
-        return -1
+    #numA = get_array_int_val(A)
+    #numB = get_array_int_val(B)
+    #if numA > 1000 or numB > 1000:
+    #    return -1
 
     # Ensure arrays are same length by padding 0's if necessary
     while len(A) < len(B):
-        A.insert(0, 0)
+        A.insert(0, int(0))
     while len(B) < len(A):
-        B.insert(0, 0)
+        B.insert(0, int(0))
 
     # m = middle index
-    m = math.floor(len(A)//2)
+    m = math.ceil(len(A)/2)
 
     # split arrays
     x1 = A[:m]
@@ -33,20 +35,47 @@ def karatsuba_mult( A, B ):
     # Find z0 and z2 first for use in calculating z1
     z0 = karatsuba_mult(x0, y0)
     z2 = karatsuba_mult(x1, y1)
-    z1 = karatsuba_mult(add_arrays(x1, x0), add_arrays(y1, y0)) - z2 - z0
+    z1 = karatsuba_mult(add_arrays(x1, x0), add_arrays(y1, y0)) # = (x1 + x0)(y1 + y0)
+    z1 = subtract_arrays(z1, z2)    # ... - x1y1 ...
+    z1 = subtract_arrays(z1, z0)    # ... - x0y0
 
     l = len(A)
     m = l - m   # because we index array from left, but digit significance is from right
     # xy = z2(B^2m) + z1(B^m) + z0
     # base 10 --> B = 10
-    return (z2 * math.pow(10, m * 2)) + (z1 * math.pow(10, m)) + z0
+    # return (z2 * math.pow(10, m * 2)) + (z1 * math.pow(10, m)) + z0
+
+    # (z2 * math.pow(10, m * 2))
+    for i in range(m*2):
+        z2.append(int(0))
+    # (z1 * math.pow(10, m))
+    for i in range(m):
+        z1.append(int(0))
+
+    # z2 + z1 + z0
+    return add_arrays( add_arrays(z2, z1), z0 )
+
+def exp( A, B ):
+    C = []
+    if get_array_int_val(A) < 0 or get_array_int_val(B) < 0 or get_array_int_val(A) > 1000 or get_array_int_val(B) > 1000:
+        print( "Invalid input\n" )
+        return
+    if get_array_int_val(B) == 0:
+        return [1]
+    if (get_array_int_val(B) % 2) == 0:
+        C = exp(A, halve_array(B))
+        return karatsuba_mult( C, C )
+    z = [1]
+    C = exp(A, halve_array(subtract_arrays(B, z)))
+    C = karatsuba_mult( C, C )
+    return karatsuba_mult( A, C )
 
 def add_arrays(A, B):
     # Ensure the arrays are of even length by padding 0's if necessary
     while len(A) < len(B):
-        A.insert(0, 0)
+        A.insert(0, int(0))
     while len(B) < len(A):
-        B.insert(0, 0)
+        B.insert(0, int(0))
 
     C = []  # return value is also an array
     i = len(A) - 1  # start with least-significant digit
@@ -68,6 +97,49 @@ def add_arrays(A, B):
 
     return C
 
+def subtract_arrays(A, B):  # Only works for A <= B
+    # Ensure the arrays are of even length by padding 0's if necessary
+    while len(A) < len(B):
+        A.insert(0, int(0))
+    while len(B) < len(A):
+        B.insert(0, int(0))
+
+    C = []  # return value is also an array
+    i = len(A) - 1  # start with least-significant digit
+    while i >= 0:   # for each digit in arrays
+        c = A[i] - B[i]
+        if c < 0:
+            A[i-1] -= 1
+            c = 10 + c
+        C.insert(0, int(c))
+        i -= 1
+
+    return C
+
+def halve_array( A ):
+    Q = []  # Quotient in array
+    i = 1
+    d = [int(A[0])]
+    while i <= len(A):
+        if get_array_int_val(d) / 2 >= 1:
+            #Q.append( int(A[i]) / 2 )
+            Q.append( math.floor(get_array_int_val(d) / 2) )
+            d = [int(get_array_int_val(d) % 2)]
+        else:
+            if get_array_int_val(d) == 0:
+                Q.append( int(0) )
+            if i == len(A) and get_array_int_val(d) == 0:
+                return Q
+            elif i == len(A) and get_array_int_val(d) != 0:
+                # We are only dividing even numbers, so should never reach this
+                print("Halved array with remainder ", get_array_int_val(d), "\n")
+            else:
+                d.append(int(A[i]))
+
+            i += 1
+
+    return Q
+
 def get_array_int_val( A ):
     num = 0
     numstr = ""
@@ -75,19 +147,51 @@ def get_array_int_val( A ):
         numstr += str(c)
     if numstr != "":
         num += int(numstr)
-    return num
+    return int(num)
+
+def get_int_array( num: int ):
+    A = [int(n) for n in str(num)]
+    return A
+
+def get_array_str( A ):
+    padRemoved = 0
+    S = ""
+
+    for n in A:
+        if n != 0:
+            padRemoved = 1
+        if padRemoved == 1:
+            S += str(n)
+
+    if len(S) == 0:
+        S += "0"
+
+    return S
 
 def main():
     # Get input values
-    num1 = input("> Enter a number A (<= 1000) to multiply using the Karatsuba Algorithm:\n")
-    num2 = input("> Enter a number B (<= 1000) to multiply using the Karatsuba Algorithm:\n")
+    num1 = int(input("> Enter a number A (<= 1000) to multiply using the Karatsuba Algorithm:\n"))
+    num2 = int(input("> Enter a number B (<= 1000) to multiply using the Karatsuba Algorithm:\n"))
 
     # Store values as digit arrays
-    A = [int(n) for n in str(num1)]
-    B = [int(n) for n in str(num2)]
+    A = get_int_array(num1)
+    B = get_int_array(num2)
+
+    # Test halving
+    print("half A = ", get_array_str(halve_array(A)), "\n")
+    print("half B = ", get_array_str(halve_array(B)), "\n")
+
+    # Test addition
+    print("\nA + B = ", get_array_str(add_arrays(A, B)), "\n")
+
+    # Test subtraction
+    print("\nA - B = ", get_array_str(subtract_arrays(A, B)), "\n")
 
     # Output result
-    print("\n = ", int(karatsuba_mult(A, B)), "\n")
+    print("\nA * B = ", get_array_str(karatsuba_mult(A, B)), "\n")
+
+    # Output result of exponentiation
+    print("\nA ^ B = ", get_array_str(exp(A, B)), "\n")
 
 if __name__ == "__main__":
     while True:
