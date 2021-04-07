@@ -10,12 +10,6 @@ def karatsuba_mult( A, B ) -> List[int]:
         C = get_int_array(c)
         return C
 
-    # Ensure arrays' int values are both <= 1000
-    #numA = get_array_int_val(A)
-    #numB = get_array_int_val(B)
-    #if numA > 1000 or numB > 1000:
-    #    return -1
-
     # Ensure arrays are same length by padding 0's if necessary
     while len(A) < len(B):
         A.insert(0, int(0))
@@ -64,14 +58,16 @@ def exp( A, B ) -> List[int]:
         return [0]
 
     if get_array_int_val(B) == 0:
-        return [1]
+        return [1]  # n^0 = 1
 
     C = []
 
+    # If value of B is even, we use halve_array(B) to get the value of B/2
     if (get_array_int_val(B) % 2) == 0:
         C = C + exp(A, halve_array(B))
         return karatsuba_mult( C, C )
 
+    # If value of B is odd, instead use subtract_arrays( B, [1] ) so we can get get (B-1)/2
     z = [1]
     C = C + exp(A, halve_array(subtract_arrays(B, z)))
     C = karatsuba_mult( C, C )
