@@ -1,3 +1,5 @@
+# by Nicholas Keng and Ryan McAlpine
+
 import math
 from typing import List
 
@@ -176,29 +178,25 @@ def get_array_str( A ):
 
 def main():
     # Get input values
-    num1 = int(input("> Enter a number A (<= 1000) to multiply using the Karatsuba Algorithm:\n"))
-    num2 = int(input("> Enter a number B (<= 1000) to multiply using the Karatsuba Algorithm:\n"))
+    num1 = int(input("> Enter a number A (<= 1000):\n"))
+    num2 = int(input("> Enter a number B (<= 1000):\n"))
 
     # Store values as digit arrays
     A = get_int_array(num1)
     B = get_int_array(num2)
 
-    # Test halving
-    print("half A = ", get_array_str(halve_array(A)), "\n")
-    print("half B = ", get_array_str(halve_array(B)), "\n")
+    choice = input("> Enter '1' for multiplication, '2' for exponentiation, or '3' to quit:\n")
 
-    # Test addition
-    print("\nA + B = ", get_array_str(add_arrays(A, B)), "\n")
-
-    # Test subtraction
-    print("\nA - B = ", get_array_str(subtract_arrays(A, B)), "\n")
-
-    # Output result
-    print("\nA * B = ", get_array_str(karatsuba_mult(A, B)), "\n")
-
-    # Output result of exponentiation
-    print("\nA ^ B = ", get_array_str(exp(A, B)), "\n")
-
+    if choice == '1':
+        # Output result of multiplication
+        print("\nA * B = ", get_array_str(karatsuba_mult(A, B)), "\n")
+    elif choice == '2':
+        # Output result of exponentiation
+        print("\nA ^ B = ", get_array_str(exp(A, B)), "\n")
+    elif choice == '3':
+        quit()
+    else:
+        print("\nInvalid selection. Please choose task 1, 2, or 3.\n")
 if __name__ == "__main__":
     while True:
         main()
