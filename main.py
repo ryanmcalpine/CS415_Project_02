@@ -120,7 +120,7 @@ def subtract_arrays(A, B) -> List[int]:  # Only works for A <= B
 
     return C
 
-def halve_array( A ) -> List[int]:
+def halve_array( A ) -> List[int]:  # performs long division on the integer value of an array by 2
     Q = []  # Quotient in array
     i = 1
     d = [int(A[0])]
@@ -193,6 +193,7 @@ def main():
         quit()
     else:
         print("\nInvalid selection. Please choose task 1, 2, or 3.\n")
+
 if __name__ == "__main__":
     while True:
         main()
