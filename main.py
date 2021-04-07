@@ -1,6 +1,7 @@
 import math
+from typing import List
 
-def karatsuba_mult( A, B ):
+def karatsuba_mult( A, B ) -> List[int]:
     # Base case: single digits
     if len(A) == 1 and len(B) == 1:
         c = int(A[0]) * int(B[0])
@@ -55,22 +56,27 @@ def karatsuba_mult( A, B ):
     # z2 + z1 + z0
     return add_arrays( add_arrays(z2, z1), z0 )
 
-def exp( A, B ):
-    C = []
+def exp( A, B ) -> List[int]:
     if get_array_int_val(A) < 0 or get_array_int_val(B) < 0 or get_array_int_val(A) > 1000 or get_array_int_val(B) > 1000:
         print( "Invalid input\n" )
-        return
+        return [0]
+
     if get_array_int_val(B) == 0:
         return [1]
-    if (get_array_int_val(B) % 2) == 0:
-        C = exp(A, halve_array(B))
-        return karatsuba_mult( C, C )
-    z = [1]
-    C = exp(A, halve_array(subtract_arrays(B, z)))
-    C = karatsuba_mult( C, C )
-    return karatsuba_mult( A, C )
 
-def add_arrays(A, B):
+    C = []
+
+    if (get_array_int_val(B) % 2) == 0:
+        C = C + exp(A, halve_array(B))
+        return karatsuba_mult( C, C )
+
+    z = [1]
+    C = C + exp(A, halve_array(subtract_arrays(B, z)))
+    C = karatsuba_mult( C, C )
+    C = karatsuba_mult( A, C )
+    return C
+
+def add_arrays(A, B) -> List[int]:
     # Ensure the arrays are of even length by padding 0's if necessary
     while len(A) < len(B):
         A.insert(0, int(0))
@@ -97,7 +103,7 @@ def add_arrays(A, B):
 
     return C
 
-def subtract_arrays(A, B):  # Only works for A <= B
+def subtract_arrays(A, B) -> List[int]:  # Only works for A <= B
     # Ensure the arrays are of even length by padding 0's if necessary
     while len(A) < len(B):
         A.insert(0, int(0))
@@ -116,7 +122,7 @@ def subtract_arrays(A, B):  # Only works for A <= B
 
     return C
 
-def halve_array( A ):
+def halve_array( A ) -> List[int]:
     Q = []  # Quotient in array
     i = 1
     d = [int(A[0])]
@@ -132,7 +138,8 @@ def halve_array( A ):
                 print("Halved array with remainder ", get_array_int_val(d), "\n")
             else:
                 d.append(int(A[i]))
-                if A[i] == 0:
+                #if A[i] == 0:
+                if get_array_int_val(d) == 0:
                     Q.append(int(0))
 
             i += 1
